@@ -52,6 +52,10 @@ export const reducer = (state, action) => {
             return {
                 ...state,updateButtonVisible:action.value
             }
+        case 'change_update_button_id':
+            return {
+                ...state,updateButtonId:action.value
+            }
 
     }
 }

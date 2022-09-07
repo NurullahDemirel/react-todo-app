@@ -12,14 +12,13 @@ const Todos = ({isDarkMode}) => {
         todo: {text:'',isComplete:false},
         buttonIsDisabled:false,
         checkboxReadOnly:false,
-        updateButtonVisible:false
+        updateButtonVisible:false,
+        updateButtonId:null
     });
 
     useEffect(() => {
         fetchData();
     }, []);
-
-    const updateBtn = document.getElementById('updateBtn');
 
     const fetchData =  () => {
         axios.get(requests.url).then(response => {
@@ -53,13 +52,17 @@ const Todos = ({isDarkMode}) => {
 
     const updateTodo = (e) =>{
         if (checkInput()){
-            const todoId = e.target.getAttribute('todo-id');
+            const todoId = state.updateButtonId
             axios.put(`${requests.url}/${todoId}`,{
                 isComplete:state.todo.isComplete,
                 description:state.todo.text
             }).then(response => {
                 clearInput();
                 changeForTodoIsComplete(false);
+                dispatch({
+                    type:'change_update_button_visible',
+                    value:false
+                })
                 dispatch({
                     type:'set_todos',
                     todos:state.todos.map((item) => item.id === todoId ? {...item,isComplete:state.todo.isComplete,description:state.todo.text} : item )
@@ -109,7 +112,7 @@ const Todos = ({isDarkMode}) => {
     const changeForTodoIsComplete = (e) => {
         dispatch({
             type:'change_form_is_complete',
-            value:e.target.checked
+            value:e.target ? e.target.checked : e
         })
     }
 
@@ -135,7 +138,10 @@ const Todos = ({isDarkMode}) => {
     },[state.todo])
 
     const setFormData = useCallback(todo => {
-        updateBtn.setAttribute('todo-id',todo.id);
+        dispatch({
+            type:'change_update_button_id',
+            value:todo.id
+        });
         dispatch({
             type:'set_form_todo',
             todo : todo
@@ -145,7 +151,7 @@ const Todos = ({isDarkMode}) => {
             value:true
         })
 
-    },[state.todo])
+    },[])
     const getCurrentTimestamp = () =>  {
         return Date.now()
     }
